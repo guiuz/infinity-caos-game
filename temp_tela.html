@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary-fixed": "#1f0052",
+            "secondary-fixed": "#ffbdf3",
+            "on-primary-fixed-variant": "#006065",
+            "on-secondary": "#400040",
+            "surface-tint": "#99f7ff",
+            "error-dim": "#d7383b",
+            "on-secondary-container": "#fff5f9",
+            "tertiary-fixed-dim": "#b190ff",
+            "background": "#0b0e13",
+            "on-surface": "#f5f6fe",
+            "surface-container-lowest": "#000000",
+            "on-tertiary": "#290067",
+            "on-tertiary-fixed-variant": "#4700a7",
+            "surface-container-high": "#1c2027",
+            "tertiary-dim": "#874cff",
+            "surface-container-highest": "#22262d",
+            "surface-container": "#161a20",
+            "surface-dim": "#0b0e13",
+            "on-error": "#490006",
+            "on-surface-variant": "#a9abb2",
+            "inverse-surface": "#f9f9ff",
+            "error": "#ff716c",
+            "on-tertiary-container": "#f8f1ff",
+            "surface-container-low": "#101419",
+            "outline-variant": "#45484e",
+            "tertiary-fixed": "#bda1ff",
+            "primary-fixed-dim": "#00e2ee",
+            "error-container": "#9f0519",
+            "outline": "#73757c",
+            "on-primary": "#005f64",
+            "secondary-container": "#a900a9",
+            "on-error-container": "#ffa8a3",
+            "primary-container": "#00f1fe",
+            "secondary": "#ff51fa",
+            "tertiary": "#ac89ff",
+            "on-primary-fixed": "#004145",
+            "on-secondary-fixed": "#620061",
+            "surface-bright": "#282c34",
+            "on-primary-container": "#00555a",
+            "inverse-on-surface": "#52555b",
+            "secondary-fixed-dim": "#ffa6f3",
+            "primary-dim": "#00e2ee",
+            "surface": "#0b0e13",
+            "tertiary-container": "#7000ff",
+            "inverse-primary": "#006a70",
+            "primary-fixed": "#00f1fe",
+            "on-secondary-fixed-variant": "#920091",
+            "secondary-dim": "#ff51fa",
+            "primary": "#99f7ff",
+            "on-background": "#f5f6fe",
+            "surface-variant": "#22262d"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Manrope"],
+            "label": ["Space Grotesk"]
+          },
+          borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .kinetic-grid {
+      background-image:
+        linear-gradient(to right, rgba(153, 247, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(153, 247, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .glow-primary {
+      filter: drop-shadow(0 0 12px rgba(0, 242, 255, 0.4));
+    }
+
+    .glow-secondary {
+      filter: drop-shadow(0 0 12px rgba(255, 81, 250, 0.3));
+    }
+
+    .glass-panel {
+      background: rgba(16, 20, 25, 0.6);
+      backdrop-filter: blur(24px);
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface font-body overflow-hidden selection:bg-primary selection:text-on-primary">
+  <!-- Top Navigation Shell -->
+  <nav
+    class="fixed top-0 w-full z-50 bg-[#0b0e13]/80 backdrop-blur-xl border-b border-[#99f7ff]/15 flex justify-between items-center px-10 h-20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+    <div class="flex items-center gap-12">
+      <div
+        class="text-2xl font-black tracking-tighter text-[#00F2FF] drop-shadow-[0_0_8px_rgba(0,242,255,0.4)] font-headline uppercase">
+        CAOS PULSE
+      </div>
+      <div class="hidden lg:flex items-center gap-8 font-['Space_Grotesk'] uppercase tracking-[0.1em] text-xs">
+        <a class="text-[#00F2FF] border-b-2 border-[#00F2FF] pb-1 active:scale-95 transition-all duration-75"
+          href="#">STRIKE</a>
+        <a class="text-slate-400 hover:text-[#00F2FF] transition-colors hover:bg-[#99f7ff]/5 px-2 py-1"
+          href="#">CLASSIFICAÇÃO</a>
+        <a class="text-slate-400 hover:text-[#00F2FF] transition-colors hover:bg-[#99f7ff]/5 px-2 py-1"
+          href="#">MARKET</a>
+        <a class="text-slate-400 hover:text-[#00F2FF] transition-colors hover:bg-[#99f7ff]/5 px-2 py-1"
+          href="#">HANGAR</a>
+        <a class="text-slate-400 hover:text-[#00F2FF] transition-colors hover:bg-[#99f7ff]/5 px-2 py-1"
+          href="#">STATIONS</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-4 border-x border-outline-variant/20 px-6 h-10">
+        <button class="text-slate-400 hover:text-primary transition-colors flex items-center gap-2 group">
+          <span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+          <span class="text-[10px] font-headline font-bold tracking-widest uppercase hidden xl:block">Settings</span>
+        </button>
+        <button class="text-slate-400 hover:text-error transition-colors flex items-center gap-2 group">
+          <span class="material-symbols-outlined text-xl" data-icon="logout">logout</span>
+          <span class="text-[10px] font-headline font-bold tracking-widest uppercase hidden xl:block">Logout</span>
+        </button>
+      </div>
+      <div class="flex items-center gap-4 group cursor-pointer">
+        <div class="text-right">
+          <p class="text-[10px] text-on-surface-variant font-headline tracking-tighter uppercase">Pilot_ID</p>
+          <p class="text-sm font-bold text-on-surface">CYBER_STRIKER</p>
+        </div>
+        <div class="w-10 h-10 bg-primary-container p-0.5 ring-1 ring-primary/30">
+          <img alt="Pilot Profile" class="w-full h-full object-cover"
+            data-alt="Close-up portrait of a futuristic pilot wearing a sleek black helmet with glowing cyan visors and intricate mechanical details"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHJAY7k4P3N6Zk-_-x6EPj6Xgjk2rfrn7Va_BtypzBEawrnA8r2ZAZq601LUYNy-aqU61DSNKx0TO_VsvJa_ebOk9asta_seJiHQURu11tHTab01qmT_ERIjVyvVTbLCzKy8q5amewztP9l1x4awZJf-ww_W0LGQ7n6ZlHwtF3mnr153BgpkLXOkSlnXpljeDgoHfImtSh6Lo4RR_yekumh23hs7NKA4qsJpG0vMCs9DhQBjidQPTt0hP613cEKreYr0VQ-NQicGs" />
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- Main Content Canvas -->
+  <main class="pt-20 h-screen w-full relative overflow-hidden bg-background kinetic-grid">
+    <!-- Hero Background Character/Vehicle -->
+    <div class="absolute inset-0 z-0 flex items-center justify-center translate-y-8">
+      <div class="relative w-full h-full max-w-6xl">
+        <img alt="Sleek space vehicle" class="w-full h-full object-contain glow-primary opacity-90 scale-110"
+          data-alt="A futuristic sci-fi racing spacecraft with glowing blue engine ports and sleek aerodynamic obsidian chassis against a dark background"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX-bMBlJjuo8qKKWDjGO8y0O1RsOZvsDgA7T-s124zHvHJcT5738sG4EMSLRD-KRX40dzrMfWPZiaeHG-PAMAQ5-75T4oeXJ4yKDrC0S9pWYbe0uvvtbZ1CRmbWxc3u0pItSEEcrCZoF9IggP4wKvlVDac9ol84cQY2j7wqpPuWfWb5MX23DRQwjOkjAa2GM8FMJLgmC7rEzNatSEJ-r4RWykGrFcz2PB7zEBVJCD3mwGO3AZ5eBCYEo-UGLWfJGqrRBwsGTBWbIo" />
+        <!-- Ambient Glow Behind Image -->
+        <div class="absolute inset-0 bg-primary/5 blur-[120px] rounded-full scale-75 -z-10"></div>
+      </div>
+    </div>
+    <!-- Foreground Tactical Overlay -->
+    <section class="relative z-10 h-full p-12 lg:p-16 flex flex-col justify-between">
+      <!-- Hero Title & Status -->
+      <div class="flex justify-between items-start">
+        <div class="max-w-3xl">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="w-8 h-[1px] bg-primary"></span>
+            <p class="text-[10px] font-headline font-bold text-primary tracking-[0.3em] uppercase">Sector 7 Active
+              Deployment</p>
+          </div>
+          <h1
+            class="font-headline text-8xl lg:text-9xl font-black text-primary tracking-tighter italic leading-none glow-primary mb-6">
+            CAOS PULSE
+          </h1>
+          <div class="flex gap-4">
+            <div class="bg-primary/10 border-l-4 border-primary px-4 py-2">
+              <p class="text-[10px] font-headline font-bold text-primary tracking-widest uppercase">System Status</p>
+              <p class="text-sm font-headline font-black text-on-surface">NOMINAL / ALL SYSTEMS READY</p>
+            </div>
+          </div>
+        </div>
+        <!-- Profile Cluster/Quick Stats -->
+        <div class="glass-panel p-6 border-l border-primary/20 flex flex-col gap-6 min-w-[320px]">
+          <div class="flex justify-between items-center border-b border-outline-variant/30 pb-4">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-secondary" data-icon="bolt">bolt</span>
+              <span class="font-headline font-bold text-sm tracking-widest uppercase">PULSE CHARGE</span>
+            </div>
+            <span class="font-headline font-black text-secondary">88%</span>
+          </div>
+          <!-- Stats Bars -->
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-[10px] font-headline font-bold tracking-widest mb-1">
+                <span>KINETIC SHIELD</span>
+                <span class="text-primary">100 / 100</span>
+              </div>
+              <div class="h-1.5 w-full bg-surface-container-highest">
+                <div class="h-full bg-primary shadow-[0_0_8px_rgba(153,247,255,0.6)] w-full"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10px] font-headline font-bold tracking-widest mb-1">
+                <span>PULSE POWER</span>
+                <span class="text-secondary">4.2 GW</span>
+              </div>
+              <div class="h-1.5 w-full bg-surface-container-highest">
+                <div class="h-full bg-secondary shadow-[0_0_8px_rgba(255,81,250,0.6)] w-[88%]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom Content: Action & Missions -->
+      <div class="flex justify-between items-end">
+        <!-- Mission Briefing -->
+        <!-- Primary CTA -->
+        <div class="flex flex-col items-end gap-6">
+          <div class="text-right">
+            <p class="text-xs font-headline font-bold tracking-widest text-on-surface-variant uppercase">Estimated
+              Launch Window</p>
+            <p class="text-4xl font-headline font-black text-on-surface italic">T-MINUS 00:42</p>
+          </div>
+          <button onclick="window.location.href='index.html'"
+            class="group relative px-12 py-6 bg-primary text-on-primary font-headline font-black text-2xl tracking-[0.2em] transition-all hover:scale-105 active:scale-95 cursor-pointer">
+            <div class="absolute -inset-1 bg-primary/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <span class="relative z-10">START MISSION</span>
+            <!-- Decorative Corners -->
+            <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-on-primary"></div>
+            <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-on-primary"></div>
+          </button>
+        </div>
+      </div>
+    </section>
+    <!-- Decorative UI Elements -->
+    <div class="absolute top-1/2 right-12 -translate-y-1/2 flex flex-col gap-4 z-0 opacity-40">
+      <div class="w-1 h-20 bg-primary/20"></div>
+      <div class="w-1 h-4 bg-primary"></div>
+      <div class="w-1 h-32 bg-primary/10"></div>
+    </div>
+    <div class="absolute bottom-12 left-12 flex gap-4 z-0 opacity-40">
+      <div class="h-1 w-20 bg-primary/20"></div>
+      <div class="h-1 w-4 bg-primary"></div>
+      <div class="h-1 w-32 bg-primary/10"></div>
+    </div>
+  </main>
+  <!-- UI Overlay Masks -->
+  <div class="pointer-events-none fixed inset-0 z-[60] border-[40px] border-background/20 mix-blend-overlay"></div>
+  <div
+    class="pointer-events-none fixed top-0 left-0 w-full h-32 bg-gradient-to-b from-background to-transparent z-[45]">
+  </div>
+  <div
+    class="pointer-events-none fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent z-[45]">
+  </div>
+</body>
+
+</html>
