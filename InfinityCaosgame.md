@@ -1,7 +1,7 @@
 🔲 [SYSTEM.LOG] Infinity Caos // v1.0 [PixiJS Edition]
 "Bem-vindo ao Grid. A arena foi overclockada. A aceleração de hardware está ativa. Sobreviva."
 
-Infinity Caos é uma experiência arcade top-down implacável. Migrado de Vanilla Canvas para PixiJS, o sistema agora utiliza WebGL/WebGPU para entregar um caos visual sem precedentes: milhares de partículas neon, shaders de distorção e performance estável em 60+ FPS, mesmo sob fogo pesado.
+Infinity Caos é uma experiência arcade top-down implacável. Criada com Vanilla Canvas, o sistema agora utiliza WebGL/WebGPU para entregar um caos visual sem precedentes: milhares de partículas neon, shaders de distorção e performance estável em 60+ FPS, mesmo sob fogo pesado.
 
 ⚡ PROTOCOLOS DO SISTEMA (Features)
 
