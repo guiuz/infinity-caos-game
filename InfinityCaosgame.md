@@ -1,43 +1,28 @@
-🔲 [SYSTEM.LOG] Infinity Caos // v1.0 [PixiJS Edition]
-"Bem-vindo ao Grid. A arena foi overclockada. A aceleração de hardware está ativa. Sobreviva."
+🔲 [SYSTEM.LOG] Infinity Caos // v0.9
 
-Infinity Caos é uma experiência arcade top-down implacável. Criada com Vanilla Canvas, o sistema agora utiliza WebGL/WebGPU para entregar um caos visual sem precedentes: milhares de partículas neon, shaders de distorção e performance estável em 60+ FPS, mesmo sob fogo pesado.
+"Bem-vindo ao Grid. A arena está ativa. As IAs estão à caça. Sobreviva."
+
+Infinity Caos é uma experiência arcade top-down implacável. Desenvolvido nativamente em HTML5 Canvas e JavaScript puro, este projeto empurra o jogador para um mundo procedural cibernético onde o movimento constante é a única forma de escapar à eliminação.
 
 ⚡ PROTOCOLOS DO SISTEMA (Features)
 
-🌍 Geração de Biomas Dinâmicos: A arena (4000x4000) é gerenciada via PIXI.Container e Culling inteligente, permitindo biomas complexos como Labirintos de Reflexão e Zonas Mortas sem perda de performance.
+🌍 Geração de Biomas Dinâmicos: A arena (4000x4000) reconfigura-se em zonas de combate tático: Arenas Abertas, Labirintos de Reflexão, Campos Minados e Zonas Mortas.
 
-💥 Mutação de Pulso [CRÍTICO]: A cada 50s, uma anomalia varre o Grid. O PixiJS processa o PULSE através de filtros de displacement e partículas de alta densidade. O que não estiver atrás de cobertura geométrica é vaporizado.
+💥 Mutação de Pulso [CRÍTICO]: A cada 50s, uma anomalia varre a arena. O que não estiver atrás de cobertura é vaporizado. O ambiente sofre mutação instantânea.
 
-⏳ Overdrive Neural (Adrenaline Mode): Manipulação de ticker.speed para colapso temporal (Slow-Mo) com interpolação suave de movimentos.
+⏳ Overdrive Neural (Adrenaline Mode): O tempo entra em colapso (Slow-Mo) quando a deteção de perigo é iminente. Use esta janela para executar manobras evasivas evasivas perfeitas.
 
-🏆 Sincronização Global: Integração com Firebase (Firestore) para registros de pontuação em tempo real. O Top 10 dita quem domina a rede.
+🏆 Sincronização Global: Integração direta com os servidores Firebase (Firestore) para registo de pontuações em tempo real. O Top 10 dita quem domina a rede.
 
 🕹️ INTERFACE DE OPERADOR (Como Jogar)
 
-Assimilie Alvos de Dados (Rosas) para escalar o multiplicador de Combo.
+A sua missão é assimilar Alvos de Dados (Rosas) o mais rapidamente possível para escalar o multiplicador de Combo, enquanto evita a aniquilação.
 
 [ CONTROLOS DE NAVEGAÇÃO ]
 
-Desktop: Avatar segue o vetor do cursor. PointerDown ativa o DASH.
+🖥️ Desktop: O avatar segue o vetor do cursor. [CLIQUE ESQUERDO] para ativar o Propulsor (DASH).
 
-Mobile: Virtual Joystick + Botão de DASH dedicado.
-
-⚙️ ARQUITETURA DE DADOS (Tech Stack)
-
-A performance agora é movida por aceleração de GPU:
-
-Motor Gráfico: PixiJS v8 (Renderização WebGL/WebGPU).
-
-Gerenciamento de Sprites: PIXI.SpriteBatch para inimigos e PIXI.ParticleContainer para explosões neon.
-
-Efeitos de Post-Processing: Shaders customizados (GLSL) para brilho neon, aberração cromática durante o PULSE e rastro de fotões.
-
-Física: Lógica de colisões OBB e vetores integrada ao loop de animação do PIXI.Ticker.
-
-Soundscape: Síntese de áudio em tempo real via Web Audio API (Zero assets de áudio externos).
-
-Backend: Firebase v11 (Auth Anónimo + regras seguras de Firestore para o Leaderboard).
+📱 Mobile: Interface tátil (Joystick esquerdo) + Botão de DASH dedicado.
 
 [ ARQUIVOS DE SUPORTE - POWERUPS ]
 
@@ -49,7 +34,7 @@ Backend: Firebase v11 (Auth Anónimo + regras seguras de Firestore para o Leader
 
 ⚠️ REGISTO DE AMEAÇAS (IAs Inimigas)
 
-As IAs agora utilizam a abstração de Sprites do Pixi para feedback visual imediato:
+O sistema adapta-se à sua eficiência. Ameaças de nível superior são injetadas na arena consoante o seu Score.
 
 [ TIPO: CHASER ] 🔴 Normal: Entidade básica de perseguição vetorial.
 
@@ -65,16 +50,32 @@ As IAs agora utilizam a abstração de Sprites do Pixi para feedback visual imed
 
 👑 ENTIDADES APEX (Bosses)
 
-[THE ARCHITECT] (Ciano): Manipulador da matriz. Move obstáculos do WorldContainer e constrói barreiras de contenção.
+Aviso de incursão massiva a cada 100 pontos:
 
-[SNIPER GOD] (Vermelho): Dispara rajadas em leque com Shaders de brilho intenso e utiliza translocação quântica (teleporte).
+[ THE ARCHITECT ] (Ciano): Manipulador da matriz. Força obstáculos inertes a moverem-se e constrói barreiras de contenção ao redor do alvo.
 
-🔌 SEQUÊNCIA DE INÍCIO (Setup)
+[ SNIPER GOD ] (Vermelho): Dispara rajadas em leque (3 lasers) que saltam pelo mapa. Utiliza translocação quântica (teleporte) após cada ataque.
 
-Inclua o PixiJS via CDN ou NPM.
+⚙️ ARQUITETURA DE DADOS (Tech Stack)
 
-Certifique-se de que o App está configurado para resizeTo: window.
+Nenhuma framework gráfica externa foi utilizada. Construído para máxima performance "bare-metal":
 
-O projeto utiliza Object Pooling para todos os projéteis e inimigos para evitar picos de Lag.
+Motor de Renderização: HTML5 <canvas> com rotinas de partículas procedurais customizadas.
 
-"Fim de Transmissão." // Desenvolvido com Adrenalina, Café e WebGL.
+Lógica Core: Vanilla JavaScript (Física de colisões OBB, IA Vetorial, Loop de Animação).
+
+Soundscape: Síntese de áudio em tempo real via Web Audio API (Zero assets de áudio externos).
+
+Backend: Firebase v11 (Auth Anónimo + regras seguras de Firestore para o Leaderboard).
+
+🔌 SEQUÊNCIA DE INÍCIO (Setup Local)
+
+O projeto é "Plug & Play".
+
+Clone ou transfira os ficheiros.
+
+Execute o ficheiro square.html num browser moderno (Chrome/Edge/Firefox recomendado).
+
+Conecte-se e tente dominar o Grid.
+
+"Fim de Transmissão." // Desenvolvido com muita Adrenalina e Café. Reporte anomalias (bugs) no nosso Discord.
