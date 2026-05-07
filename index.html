@@ -1392,7 +1392,8 @@
                 </div>
             </div>
         </div>
-        <!-- PixiJS App vai injetar o Canvas aqui -->
+
+        <canvas id="gameCanvas"></canvas>
 
         <!-- TELA DE INTRODUÇÃO DE INIMIGO -->
         <div id="enemy-intro-screen" style="
@@ -1459,18 +1460,7 @@
         </div>
     </div>
 
-    <!-- Configuração de módulos e dependências do PixiJS e Filtros -->
-    <script type="importmap">
-    {
-        "imports": {
-            "pixi.js": "https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.0.4/pixi.mjs",
-            "pixi-filters": "https://cdn.jsdelivr.net/npm/pixi-filters@6.0.5/dist/pixi-filters.mjs"
-        }
-    }
-    </script>
     <script type="module">
-        import { Application, Graphics, Container, Text, Ticker } from "pixi.js";
-        import { AdvancedBloomFilter, CRTFilter, GlitchFilter } from "pixi-filters";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import {
             getAuth,
@@ -2456,6 +2446,8 @@
         }
 
         // --- VARIÁVEIS DO JOGO ---
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
         const scoreVal = document.getElementById("score-val");
         const levelVal = document.getElementById("level-val");
         const pulseVal = document.getElementById("pulse-val");
@@ -2468,51 +2460,8 @@
         const gameOverScreen = document.getElementById("game-over-screen");
         const pauseScreen = document.getElementById("pause-screen");
 
-        // Setup PixiJS (Substituindo o Canvas Vanilla)
-        const app = new Application();
-        await app.init({
-            width: window.innerWidth,
-            height: window.innerHeight,
-            backgroundColor: 0x020202,
-            resizeTo: window,
-            antialias: true
-        });
-        document.getElementById("game-container").appendChild(app.canvas);
-        app.canvas.id = "gameCanvas";
-        app.canvas.style.cursor = "crosshair";
-        const canvas = app.canvas;
-
-        const worldContainer = new Container();
-        app.stage.addChild(worldContainer);
-        const gfx = new Graphics();
-        worldContainer.addChild(gfx);
-        const textLayer = new Container();
-        worldContainer.addChild(textLayer);
-
-        // --- Inicialização de Shaders e Post-Processing (WebGL Nativo) ---
-        const bloomFilter = new AdvancedBloomFilter({
-            threshold: 0.3,
-            bloomScale: 1.5,
-            brightness: 1.2,
-            blur: 6,
-            quality: 4
-        });
-
-        const crtFilter = new CRTFilter({
-            curvature: 2.0,
-            lineWidth: 1.2,
-            lineContrast: 0.25,
-            noise: 0.12,
-            vignetting: 0.3,
-            vignettingAlpha: 0.7,
-            time: 0
-        });
-
-        const glitchFilter = new GlitchFilter({ slices: 10, offset: 0, direction: 0 });
-        glitchFilter.enabled = false;
-
-        // Aplica os filtros na tela inteira para o efeito Global Unificado
-        app.stage.filters = [bloomFilter, glitchFilter, crtFilter];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         let playerName = "";
         let score = 0;
@@ -3232,11 +3181,7 @@
             soundManager.playGameMusic();
             gameStarted = true;
             resetGameParams();
-
-            // Garante que o ticker seja adicionado apenas uma vez
-            app.ticker.remove(gameLoop);
-            app.ticker.add(gameLoop);
-
+            requestAnimationFrame(gameLoop);
             window.dispatchEvent(new Event("resize"));
         });
 
@@ -3394,8 +3339,8 @@
                 document.getElementById("joystick-base").style.display = "none";
             }
             const rect = canvas.getBoundingClientRect();
-            screenMouse.x = e.clientX;
-            screenMouse.y = e.clientY;
+            screenMouse.x = e.clientX - rect.left;
+            screenMouse.y = e.clientY - rect.top;
         });
         canvas.addEventListener("mousedown", (e) => {
             if (e.button === 0) triggerPlayerDash();
@@ -5422,25 +5367,25 @@
         }
 
         function draw() {
+            ctx.fillStyle = "#020202";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             if (!gameStarted) return;
 
-            gfx.clear();
-
+            ctx.save();
             if (screenShake > 0) {
-                worldContainer.x = (Math.random() - 0.5) * screenShake;
-                worldContainer.y = (Math.random() - 0.5) * screenShake;
+                ctx.translate(
+                    (Math.random() - 0.5) * screenShake,
+                    (Math.random() - 0.5) * screenShake,
+                );
                 screenShake *= 0.9;
                 if (screenShake < 0.5) screenShake = 0;
-            } else {
-                worldContainer.x = 0;
-                worldContainer.y = 0;
             }
-
-            worldContainer.scale.set(camera.zoom);
-            worldContainer.pivot.set(camera.x, camera.y);
-            worldContainer.position.set(0, 0); // Ajuste corrigido via pivot e zoom
+            ctx.scale(camera.zoom, camera.zoom);
+            ctx.translate(-camera.x, -camera.y);
 
             // Grelha Cyberpunk
+            ctx.strokeStyle = "rgba(0, 242, 255, 0.08)";
+            ctx.lineWidth = 2;
             const gSize = 100;
             const sX =
                 Math.floor((camera.x - gridOffset) / gSize) * gSize +
@@ -5450,31 +5395,44 @@
                 (gridOffset % gSize);
             const eX = camera.x + canvas.width / camera.zoom + gSize;
             const eY = camera.y + canvas.height / camera.zoom + gSize;
+            ctx.beginPath();
             for (let x = sX; x <= eX; x += gSize) {
-                gfx.moveTo(x, camera.y);
-                gfx.lineTo(x, eY);
+                ctx.moveTo(x, camera.y);
+                ctx.lineTo(x, eY);
             }
             for (let y = sY; y <= eY; y += gSize) {
-                gfx.moveTo(camera.x, y);
-                gfx.lineTo(eX, y);
+                ctx.moveTo(camera.x, y);
+                ctx.lineTo(eX, y);
             }
-            gfx.stroke({ width: 2, color: 0x00f2ff, alpha: 0.08 });
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "#ff7cf5";
+            ctx.stroke();
+            ctx.shadowBlur = 0;
 
             // Borda do Mundo
-            gfx.rect(0, 0, WORLD_W, WORLD_H);
-            gfx.stroke({ width: 10, color: 0xff0055, alpha: 0.5 });
+            ctx.strokeStyle = "rgba(255, 0, 85, 0.5)";
+            ctx.lineWidth = 10;
+            ctx.strokeRect(0, 0, WORLD_W, WORLD_H);
 
             let cx = WORLD_W / 2,
                 cy = WORLD_H / 2;
-            gfx.circle(cx, cy, 15);
-            gfx.fill({ color: 0x111111 });
-            gfx.stroke({ width: 3, color: 0xff6e84 });
+            ctx.beginPath();
+            ctx.arc(cx, cy, 15, 0, Math.PI * 2);
+            ctx.fillStyle = "#111";
+            ctx.strokeStyle = "#ff6e84";
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#ff6e84";
+            ctx.stroke();
+            ctx.fill();
 
             let timeUntilPulse =
                 currentPulseInterval - (Date.now() - lastPulseTime);
             if (timeUntilPulse <= 5000 && !isGameOver) {
-                gfx.circle(cx, cy, 30 + Math.sin(Date.now() / 50) * 15);
-                gfx.fill({ color: 0xff0055, alpha: 0.4 });
+                ctx.beginPath();
+                ctx.arc(cx, cy, 30 + Math.sin(Date.now() / 50) * 15, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 0, 85, 0.4)";
+                ctx.fill();
                 let isSafe = false;
                 for (let obs of obstacles) {
                     if (
@@ -5492,30 +5450,51 @@
                         break;
                     }
                 }
-                gfx.moveTo(cx, cy);
-                gfx.lineTo(player.x + player.size / 2, player.y + player.size / 2);
-                gfx.stroke({ width: isSafe ? 2 : 5, color: isSafe ? 0x00ff00 : 0xff0055, alpha: 0.6 });
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(player.x + player.size / 2, player.y + player.size / 2);
+                ctx.strokeStyle = isSafe
+                    ? "rgba(0, 255, 0, 0.6)"
+                    : "rgba(255, 0, 85, 0.8)";
+                ctx.lineWidth = isSafe ? 2 : 5;
+                ctx.setLineDash([15, 15]);
+                ctx.stroke();
+                ctx.setLineDash([]);
             }
 
             activePulses.forEach((p) => {
-                gfx.circle(cx, cy, p.radius);
-                gfx.stroke({ width: 30 * Math.max(0, 1 - p.radius / p.maxRadius), color: 0xff0055, alpha: 1 - p.radius / p.maxRadius });
+                ctx.beginPath();
+                ctx.arc(cx, cy, p.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 0, 85, ${1 - p.radius / p.maxRadius})`;
+                ctx.lineWidth = 30 * Math.max(0, 1 - p.radius / p.maxRadius);
+                ctx.shadowBlur = 50;
+                ctx.shadowColor = "#ff6e84";
+                ctx.stroke();
             });
 
             // Craters
             craters.forEach((c) => {
-                const alpha = Math.min(1, c.life / 2000);
-                gfx.circle(c.x, c.y, c.radius);
-                gfx.fill({ color: 0xff4400, alpha: 0.15 * alpha });
-                gfx.stroke({ width: 2, color: 0xff4400, alpha: 0.4 * alpha });
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, c.life / 2000);
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 68, 0, 0.15)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255, 68, 0, 0.4)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
 
-                gfx.moveTo(c.x, c.y);
-                gfx.lineTo(c.x + c.radius * 0.8, c.y + c.radius * 0.3);
-                gfx.moveTo(c.x, c.y);
-                gfx.lineTo(c.x - c.radius * 0.6, c.y + c.radius * 0.5);
-                gfx.moveTo(c.x, c.y);
-                gfx.lineTo(c.x + c.radius * 0.2, c.y - c.radius * 0.7);
-                gfx.stroke({ width: 1, color: 0xff4400, alpha: 0.3 * alpha });
+                // Fissuras da cratera
+                ctx.beginPath();
+                ctx.moveTo(c.x, c.y);
+                ctx.lineTo(c.x + c.radius * 0.8, c.y + c.radius * 0.3);
+                ctx.moveTo(c.x, c.y);
+                ctx.lineTo(c.x - c.radius * 0.6, c.y + c.radius * 0.5);
+                ctx.moveTo(c.x, c.y);
+                ctx.lineTo(c.x + c.radius * 0.2, c.y - c.radius * 0.7);
+                ctx.strokeStyle = "rgba(255, 68, 0, 0.3)";
+                ctx.stroke();
+                ctx.restore();
             });
 
             // Renderização da SINGULARIDADE
@@ -5528,102 +5507,219 @@
                         ? Math.pow(1.6, (7000 - timeRemaining) / 1000)
                         : 1;
 
-                gfx.circle(cx, cy, radius);
-                gfx.fill({ color: 0x05000f, alpha: 0.9 });
-                gfx.circle(cx, cy, radius * 0.85);
-                gfx.stroke({ width: 15, color: 0x7800ff, alpha: 0.4 + Math.sin(Date.now() / 50) * 0.2 });
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                let grd = ctx.createRadialGradient(
+                    cx,
+                    cy,
+                    radius * 0.2,
+                    cx,
+                    cy,
+                    radius,
+                );
+                grd.addColorStop(0, "rgba(0,0,0,1)");
+                grd.addColorStop(0.7, "rgba(5,0,15,0.9)");
+                grd.addColorStop(1, "rgba(100, 0, 255, 0)");
+                ctx.fillStyle = grd;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius * 0.85, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(120, 0, 255, ${0.4 + Math.sin(Date.now() / 50) * 0.2})`;
+                ctx.lineWidth = 15;
+                ctx.shadowBlur = 40 * pullMultiplier;
+                ctx.shadowColor = "#7800ff";
+                ctx.stroke();
 
                 for (let i = 0; i < 15 * pullMultiplier; i++) {
                     let angle = Math.random() * Math.PI * 2;
                     let r = radius * 0.3 + Math.random() * radius * 0.7;
                     let length = Math.random() * (40 + 20 * pullMultiplier) + 20;
-                    gfx.moveTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
-                    gfx.lineTo(cx + Math.cos(angle) * (r - length), cy + Math.sin(angle) * (r - length));
-                    gfx.stroke({ width: 2 + Math.random() * 3, color: 0xffffff, alpha: Math.random() });
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+                    ctx.lineTo(
+                        cx + Math.cos(angle) * (r - length),
+                        cy + Math.sin(angle) * (r - length),
+                    );
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${Math.random()})`;
+                    ctx.lineWidth = 2 + Math.random() * 3;
+                    ctx.stroke();
                 }
+                ctx.restore();
             }
 
             // Portals Drawing
             portals.forEach((p) => {
-                let pColor = p.type === "bonus" ? 0xff00ff : 0x00ffaa;
-                gfx.circle(p.x, p.y, p.radius);
-                gfx.stroke({ width: 4, color: pColor });
-                gfx.circle(p.x, p.y, p.radius * 0.6);
-                gfx.fill({ color: pColor, alpha: 0.3 + Math.sin(Date.now() / 150) * 0.2 });
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                let pColor = p.type === "bonus" ? "#ff00ff" : "#00ffaa";
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = pColor;
+                ctx.strokeStyle = pColor;
+                ctx.lineWidth = 4;
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        0,
+                        0,
+                        p.radius,
+                        i * ((Math.PI * 2) / 3),
+                        i * ((Math.PI * 2) / 3) + Math.PI / 2,
+                    );
+                    ctx.stroke();
+                }
+                ctx.fillStyle = pColor;
+                ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 150) * 0.2;
+                ctx.beginPath();
+                ctx.arc(0, 0, p.radius * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             });
 
             // Obstáculos
             obstacles.forEach((obs) => {
+                ctx.shadowBlur = 0;
+                ctx.setLineDash([]);
                 if (obs.type === "solid") {
-                    gfx.rect(obs.x, obs.y, obs.width, obs.height);
-                    gfx.fill({ color: 0x111111 });
-                    gfx.stroke({ width: 3, color: 0x00ff00 });
+                    ctx.fillStyle = "#111";
+                    ctx.strokeStyle = "#00ff00";
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "#00ff00";
                 } else if (obs.type === "breakable") {
-                    gfx.rect(obs.x, obs.y, obs.width, obs.height);
-                    gfx.fill({ color: 0x1a0d00 });
-                    gfx.stroke({ width: 3, color: 0xffff00 });
+                    ctx.fillStyle = "#1a0d00";
+                    ctx.strokeStyle = "#ffff00";
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([10, 5]);
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "#ffff00";
                 } else if (obs.type === "reflective") {
-                    gfx.rect(obs.x, obs.y, obs.width, obs.height);
-                    gfx.fill({ color: 0x002233 });
-                    gfx.stroke({ width: 4, color: 0x00fff2 });
+                    ctx.fillStyle = "#002233";
+                    ctx.strokeStyle = "#00fff2";
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = "#00fff2";
                 } else if (obs.type === "moving") {
-                    gfx.rect(obs.x, obs.y, obs.width, obs.height);
-                    gfx.fill({ color: 0x2a002a });
-                    gfx.stroke({ width: 4, color: 0xff00ff });
+                    ctx.fillStyle = "#2a002a";
+                    ctx.strokeStyle = "#ff00ff";
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = "#ff00ff";
                 } else if (obs.type === "mine" || obs.type === "temp_mine") {
-                    let col = obs.type === "temp_mine" ? 0xffff00 : 0xff6e84;
-                    gfx.circle(obs.x + obs.width / 2, obs.y + obs.height / 2, obs.width / 2);
-                    gfx.fill({ color: 0x330011 });
-                    gfx.stroke({ width: 3, color: col });
+                    let col = obs.type === "temp_mine" ? "#ffff00" : "#ff6e84";
+                    ctx.fillStyle = "#330011";
+                    ctx.strokeStyle = col;
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 20 + Math.sin(Date.now() / 100) * 10;
+                    ctx.shadowColor = col;
+                    ctx.beginPath();
+                    ctx.arc(
+                        obs.x + obs.width / 2,
+                        obs.y + obs.height / 2,
+                        obs.width / 2,
+                        0,
+                        Math.PI * 2,
+                    );
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.fillStyle = col;
+                    ctx.font = "20px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("✱", obs.x + obs.width / 2, obs.y + obs.height / 2);
+                    ctx.shadowBlur = 0;
+                    return;
                 }
+
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.setLineDash([]);
+                ctx.shadowBlur = 0;
             });
 
             powerups.forEach((pw) => {
-                let colorHex = parseInt(pw.color.replace("#", "0x"));
+                ctx.shadowBlur = 20 + Math.sin(Date.now() / 100) * 10;
+                ctx.shadowColor = pw.color;
+                ctx.strokeStyle = pw.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
                 if (pw.type === "shield") {
-                    gfx.circle(pw.x, pw.y, pw.size);
-                    gfx.stroke({ width: 3, color: colorHex });
+                    ctx.arc(pw.x, pw.y, pw.size, 0, Math.PI * 2);
+                    ctx.stroke();
                 } else if (pw.type === "speed") {
-                    gfx.moveTo(pw.x, pw.y - pw.size);
-                    gfx.lineTo(pw.x + pw.size, pw.y + pw.size);
-                    gfx.lineTo(pw.x - pw.size, pw.y + pw.size);
-                    gfx.lineTo(pw.x, pw.y - pw.size);
-                    gfx.stroke({ width: 3, color: colorHex });
+                    ctx.moveTo(pw.x, pw.y - pw.size);
+                    ctx.lineTo(pw.x + pw.size, pw.y + pw.size);
+                    ctx.lineTo(pw.x - pw.size, pw.y + pw.size);
+                    ctx.closePath();
+                    ctx.stroke();
                 } else if (pw.type === "bomb") {
-                    gfx.rect(pw.x - pw.size, pw.y - pw.size, pw.size * 2, pw.size * 2);
-                    gfx.stroke({ width: 3, color: colorHex });
+                    ctx.rect(pw.x - pw.size, pw.y - pw.size, pw.size * 2, pw.size * 2);
+                    ctx.stroke();
                 }
             });
 
             targets.forEach((tgt) => {
-                gfx.circle(tgt.x, tgt.y, tgt.size + Math.sin(Date.now() / 150) * 3);
-                gfx.fill({ color: parseInt(tgt.color.replace("#", "0x")) });
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = tgt.color;
+                ctx.fillStyle = tgt.color;
+                ctx.beginPath();
+                ctx.arc(
+                    tgt.x,
+                    tgt.y,
+                    tgt.size + Math.sin(Date.now() / 150) * 3,
+                    0,
+                    Math.PI * 2,
+                );
+                ctx.fill();
             });
 
             bullets.forEach((b) => {
-                let c = parseInt(b.color.replace("#", "0x"));
-                gfx.circle(b.x, b.y, b.size + (b.color === "#ff7cf5" ? 2 : 0));
-                gfx.fill({ color: c });
+                ctx.shadowBlur = b.color === "#ff7cf5" ? 30 : 15;
+                ctx.shadowColor = b.color;
+                ctx.fillStyle = b.color;
+                ctx.beginPath();
+                ctx.arc(
+                    b.x,
+                    b.y,
+                    b.size + (b.color === "#ff7cf5" ? 2 : 0),
+                    0,
+                    Math.PI * 2,
+                );
+                ctx.fill();
             });
 
             meteors.forEach((m) => {
-                let c = parseInt(m.color.replace("#", "0x"));
-                gfx.circle(m.x, m.y, m.size);
-                gfx.fill({ color: c });
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = m.color;
+                ctx.fillStyle = m.color;
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+                ctx.fill();
 
                 if (m.isAnomalyMeteor) {
-                    gfx.moveTo(m.x, m.y);
-                    gfx.lineTo(m.x - m.vx * 3, m.y - m.vy * 3);
-                    gfx.stroke({ width: m.size * 0.8, color: 0xffaa00 });
+                    ctx.beginPath();
+                    ctx.moveTo(m.x, m.y);
+                    ctx.lineTo(m.x - m.vx * 3, m.y - m.vy * 3); // Cauda longa baseada na velocidade
+                    ctx.strokeStyle = "#ffaa00";
+                    ctx.lineWidth = m.size * 0.8;
+                    ctx.stroke();
                 }
             });
 
             // DESENHAR RASTRO PROCEDURAL NEON DO JOGADOR
+            ctx.save();
+            ctx.shadowColor = player.colors.glow;
+            ctx.shadowBlur = 10;
             player.trailParticles.forEach((p) => {
-                let c = parseInt(p.color.replace("rgba(0, 242, 255, 0.9)", "0x00f2ff").replace("#", "0x"));
-                gfx.circle(p.x, p.y, p.size);
-                gfx.fill({ color: c, alpha: p.alpha });
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
             });
+            ctx.restore();
 
             // DESENHAR JOGADOR (IMPLEMENTAÇÃO TÉCNICA PROCEDURAL NEON)
             if (
@@ -5637,118 +5733,244 @@
                 let pxCenter = player.x + player.size / 2;
                 let pyCenter = player.y + player.size / 2;
 
-                let glowColor = player.speedBuffTimer > 0 ? 0x0088ff : 0x00f2ff;
-                let cos = Math.cos(player.angle);
-                let sin = Math.sin(player.angle);
-                function rotPx(x, y) { return pxCenter + x * cos - y * sin; }
-                function rotPy(x, y) { return pyCenter + x * sin + y * cos; }
+                let actualSpeed =
+                    Math.sqrt(
+                        Math.pow(player.x - player.lastX, 2) +
+                        Math.pow(player.y - player.lastY, 2),
+                    ) / Math.max(0.01, timeScale);
+                const currentSize = player.size + actualSpeed * 0.5;
+                const dashGlowBonus = player.isDashing ? 20 : 0;
 
-                gfx.moveTo(rotPx(player.size / 2, 0), rotPy(player.size / 2, 0));
-                gfx.lineTo(rotPx(-player.size / 2, -player.size * 0.425), rotPy(-player.size / 2, -player.size * 0.425));
-                gfx.lineTo(rotPx(-player.size / 2, player.size * 0.425), rotPy(-player.size / 2, player.size * 0.425));
-                gfx.lineTo(rotPx(player.size / 2, 0), rotPy(player.size / 2, 0));
-                gfx.stroke({ width: 4, color: glowColor });
+                let glowColor =
+                    player.speedBuffTimer > 0 ? "#0088ff" : player.colors.glow;
+                let coreGlowColor =
+                    player.speedBuffTimer > 0
+                        ? "rgba(0, 136, 255, 0.4)"
+                        : player.colors.coreGlow;
 
-                const coreRadius = Math.max(1, player.size * 0.2);
-                gfx.circle(pxCenter, pyCenter, coreRadius);
-                gfx.fill({ color: 0xffffff });
-            }
+                // Função interna para reutilizar o desenho do player (útil para o efeito de aberração)
+                const drawPlayerModel = (offsetX, colorOverride) => {
+                    ctx.save();
+                    ctx.translate(pxCenter + offsetX, pyCenter);
+                    ctx.rotate(player.angle);
 
-            // Shield
-            if (player.hasShield) {
-                gfx.rect(player.x - 6, player.y - 6, player.size + 12, player.size + 12);
-                gfx.stroke({ width: 4, color: 0x00ffaa });
+                    if (colorOverride) {
+                        ctx.globalCompositeOperation = "screen";
+                        ctx.strokeStyle = colorOverride;
+                        ctx.shadowColor = colorOverride;
+                        ctx.fillStyle = colorOverride;
+                        ctx.globalAlpha = 0.7; // Transparência do canal de cor
+                    } else {
+                        ctx.strokeStyle = glowColor;
+                        ctx.shadowColor = glowColor;
+                    }
+
+                    // Moldura Triangular Neon
+                    ctx.shadowBlur = colorOverride
+                        ? 15
+                        : 20 +
+                        breatheIntensity +
+                        dashGlowBonus +
+                        (player.speedBuffTimer > 0 ? 15 : 0);
+                    ctx.lineWidth = 4;
+                    ctx.lineJoin = "round";
+
+                    const halfSize = currentSize / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(halfSize, 0); // Ponta direcional voltada para frente
+                    ctx.lineTo(-halfSize, -halfSize * 0.85); // Traseira esquerda
+                    ctx.lineTo(-halfSize, halfSize * 0.85); // Traseira direita
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    ctx.shadowBlur = 0;
+
+                    // Core central brilhante
+                    const coreRadius = Math.max(1, currentSize * 0.2); // Impede que o Canvas quebre o gradiente com radius menor ou igual a 0
+                    if (!colorOverride) {
+                        const gradient = ctx.createRadialGradient(
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            coreRadius * 2,
+                        );
+                        gradient.addColorStop(0, player.colors.core);
+                        gradient.addColorStop(0.3, glowColor);
+                        gradient.addColorStop(1, coreGlowColor);
+                        ctx.fillStyle = gradient;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, coreRadius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.restore();
+                };
+
+                // Aberração Cromática no Jogador (Adrenaline Mode)
+                if (timeScale < 0.9) {
+                    let intensity = (1 - timeScale) * 15; // Deslocamento proporcional à lentidão
+                    drawPlayerModel(intensity, "#ff0000"); // Canal Vermelho
+                    drawPlayerModel(-intensity, "#ff7cf5"); // Canal Ciano
+                }
+
+                drawPlayerModel(0, null); // Desenha a cor normal por cima
+
+                // Shield
+                if (player.hasShield) {
+                    ctx.strokeStyle = "#00ffaa";
+                    ctx.lineWidth = 4;
+                    ctx.shadowColor = "#00ffaa";
+                    ctx.shadowBlur = 25;
+                    ctx.strokeRect(
+                        player.x - 6,
+                        player.y - 6,
+                        player.size + 12,
+                        player.size + 12,
+                    );
+                }
             }
 
             // Desenhar Inimigos Variados
             enemies.forEach((enemy) => {
-                let ex = enemy.x + enemy.size / 2;
-                let ey = enemy.y + enemy.size / 2;
-                let colorHex = parseInt(enemy.color.replace("#", "0x"));
+                if (enemy.type === "sniper" && enemy.state === "aiming") {
+                    ctx.beginPath();
+                    ctx.moveTo(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
+                    ctx.lineTo(player.x + player.size / 2, player.y + player.size / 2);
+                    ctx.strokeStyle = "rgba(255, 255, 0, 0.8)";
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = "#ffff00";
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
 
-                let cos = Math.cos(enemy.angle);
-                let sin = Math.sin(enemy.angle);
-                if (enemy.type === "boss_architect") { cos = 1; sin = 0; }
-                function rotX(x, y) { return ex + x * cos - y * sin; }
-                function rotY(x, y) { return ey + x * sin + y * cos; }
+                ctx.save();
+                ctx.translate(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
+
+                if (enemy.type !== "boss_architect") ctx.rotate(enemy.angle);
+
+                ctx.shadowBlur = enemy.type.includes("boss")
+                    ? 25 + Math.sin(Date.now() / 150) * 10
+                    : 15;
+                ctx.shadowColor = enemy.color;
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
 
                 if (enemy.type === "kamikaze") {
-                    let kColor = Math.floor(Date.now() / 100) % 2 === 0 ? 0xffffff : 0xff00ff;
-                    gfx.moveTo(rotX(enemy.size, 0), rotY(enemy.size, 0));
-                    gfx.lineTo(rotX(-enemy.size / 2, -enemy.size / 2), rotY(-enemy.size / 2, -enemy.size / 2));
-                    gfx.lineTo(rotX(-enemy.size / 2, enemy.size / 2), rotY(-enemy.size / 2, enemy.size / 2));
-                    gfx.fill({ color: kColor });
+                    ctx.fillStyle =
+                        Math.floor(Date.now() / 100) % 2 === 0 ? "#ffffff" : "#ff00ff";
+                    ctx.shadowColor = ctx.fillStyle;
+                    ctx.moveTo(enemy.size, 0);
+                    ctx.lineTo(-enemy.size / 2, -enemy.size / 2);
+                    ctx.lineTo(-enemy.size / 2, enemy.size / 2);
+                    ctx.closePath();
+                    ctx.fill();
                 } else if (enemy.type === "ambusher") {
-                    gfx.moveTo(rotX(0, -enemy.size / 1.5), rotY(0, -enemy.size / 1.5));
-                    gfx.lineTo(rotX(enemy.size / 2, 0), rotY(enemy.size / 2, 0));
-                    gfx.lineTo(rotX(0, enemy.size / 1.5), rotY(0, enemy.size / 1.5));
-                    gfx.lineTo(rotX(-enemy.size / 2, 0), rotY(-enemy.size / 2, 0));
-                    gfx.fill({ color: colorHex });
+                    ctx.moveTo(0, -enemy.size / 1.5); // Ponto de cima
+                    ctx.lineTo(enemy.size / 2, 0); // Ponto da direita
+                    ctx.lineTo(0, enemy.size / 1.5); // Ponto de baixo
+                    ctx.lineTo(-enemy.size / 2, 0); // Ponto da esquerda
+                    ctx.closePath();
+                    ctx.fill();
                 } else if (enemy.type === "hunter") {
-                    gfx.moveTo(rotX(enemy.size * 1.2, 0), rotY(enemy.size * 1.2, 0));
-                    gfx.lineTo(rotX(-enemy.size / 2, -enemy.size / 1.2), rotY(-enemy.size / 2, -enemy.size / 1.2));
-                    gfx.lineTo(rotX(0, 0), rotY(0, 0));
-                    gfx.lineTo(rotX(-enemy.size / 2, enemy.size / 1.2), rotY(-enemy.size / 2, enemy.size / 1.2));
-                    gfx.fill({ color: colorHex });
+                    ctx.moveTo(enemy.size * 1.2, 0);
+                    ctx.lineTo(-enemy.size / 2, -enemy.size / 1.2);
+                    ctx.lineTo(0, 0);
+                    ctx.lineTo(-enemy.size / 2, enemy.size / 1.2);
+                    ctx.closePath();
+                    ctx.fill();
                 } else if (enemy.type === "boss_sniper") {
-                    gfx.moveTo(rotX(enemy.size, 0), rotY(enemy.size, 0));
-                    gfx.lineTo(rotX(-enemy.size / 2, -enemy.size), rotY(-enemy.size / 2, -enemy.size));
-                    gfx.lineTo(rotX(-enemy.size / 2, enemy.size), rotY(-enemy.size / 2, enemy.size));
-                    gfx.fill({ color: colorHex });
-                    gfx.circle(ex, ey, 15);
-                    gfx.fill({ color: 0xffffff });
+                    ctx.moveTo(enemy.size, 0);
+                    ctx.lineTo(-enemy.size / 2, -enemy.size);
+                    ctx.lineTo(-enemy.size / 2, enemy.size);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = "#fff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+                    ctx.fill();
                 } else if (enemy.type === "boss_architect") {
-                    gfx.rect(enemy.x, enemy.y, enemy.size, enemy.size);
-                    gfx.stroke({ width: 5, color: colorHex });
-                    gfx.rect(enemy.x + enemy.size / 4, enemy.y + enemy.size / 4, enemy.size / 2, enemy.size / 2);
-                    gfx.fill({ color: colorHex });
+                    ctx.strokeStyle = enemy.color;
+                    ctx.lineWidth = 5;
+                    ctx.strokeRect(
+                        -enemy.size / 2,
+                        -enemy.size / 2,
+                        enemy.size,
+                        enemy.size,
+                    );
+                    ctx.rotate(-enemy.angle * 2);
+                    ctx.fillRect(
+                        -enemy.size / 4,
+                        -enemy.size / 4,
+                        enemy.size / 2,
+                        enemy.size / 2,
+                    );
                 } else if (enemy.type === "sniper") {
-                    gfx.moveTo(rotX(enemy.size, 0), rotY(enemy.size, 0));
-                    gfx.lineTo(rotX(0, enemy.size / 1.5), rotY(0, enemy.size / 1.5));
-                    gfx.lineTo(rotX(-enemy.size / 2, 0), rotY(-enemy.size / 2, 0));
-                    gfx.lineTo(rotX(0, -enemy.size / 1.5), rotY(0, -enemy.size / 1.5));
-                    gfx.fill({ color: colorHex });
+                    ctx.moveTo(enemy.size, 0);
+                    ctx.lineTo(0, enemy.size / 1.5);
+                    ctx.lineTo(-enemy.size / 2, 0);
+                    ctx.lineTo(0, -enemy.size / 1.5);
+                    ctx.closePath();
+                    ctx.fill();
                 } else if (enemy.type === "eye_ball") {
-                    gfx.circle(ex, ey, enemy.size / 2);
-                    gfx.stroke({ width: 6, color: 0xff00ff });
-                    gfx.circle(rotX(enemy.size / 6, 0), rotY(enemy.size / 6, 0), enemy.size / 3);
-                    gfx.fill({ color: 0xff00ff });
+                    ctx.strokeStyle = "#ff00ff";
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, enemy.size / 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.fillStyle = "#ff00ff";
+                    ctx.beginPath();
+                    ctx.arc(enemy.size / 6, 0, enemy.size / 3, 0, Math.PI * 2);
+                    ctx.fill();
                 } else {
-                    gfx.moveTo(rotX(enemy.size, 0), rotY(enemy.size, 0));
-                    gfx.lineTo(rotX(-enemy.size / 2, -enemy.size / 2), rotY(-enemy.size / 2, -enemy.size / 2));
-                    gfx.lineTo(rotX(-enemy.size / 2, enemy.size / 2), rotY(-enemy.size / 2, enemy.size / 2));
-                    gfx.fill({ color: colorHex });
+                    ctx.moveTo(enemy.size, 0);
+                    ctx.lineTo(-enemy.size / 2, -enemy.size / 2);
+                    ctx.lineTo(-enemy.size / 2, enemy.size / 2);
+                    ctx.closePath();
+                    ctx.fill();
                 }
+                ctx.restore();
             });
 
             particles.forEach((p, i) => {
-                let c = parseInt(p.color.replace("#", "0x"));
-                gfx.moveTo(p.x, p.y);
-                gfx.lineTo(p.x - p.vx * 2, p.y - p.vy * 2);
-                gfx.stroke({ width: p.size, color: c, alpha: p.life });
+                ctx.globalAlpha = p.life;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.color;
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = p.size;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x - p.vx * 2, p.y - p.vy * 2);
+                ctx.stroke();
             });
             shockwaves.forEach((sw) => {
-                let c = parseInt(sw.color.replace("#", "0x"));
-                gfx.circle(sw.x, sw.y, sw.radius);
-                gfx.stroke({ width: sw.thickness, color: c, alpha: sw.life });
+                ctx.globalAlpha = sw.life;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = sw.color;
+                ctx.strokeStyle = sw.color;
+                ctx.lineWidth = sw.thickness;
+                ctx.beginPath();
+                ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+            floatingTexts.forEach((ft) => {
+                ctx.globalAlpha = ft.life;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = ft.color;
+                ctx.fillStyle = ft.color;
+                ctx.font = "bold 20px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(ft.text, ft.x, ft.y);
             });
 
-            // Sync Floating Texts with Text Layer
-            while (textLayer.children.length < floatingTexts.length) {
-                textLayer.addChild(new Text({ text: '', style: { fontFamily: 'Arial', fontSize: 20, fontWeight: 'bold' } }));
-            }
-            while (textLayer.children.length > floatingTexts.length) {
-                textLayer.removeChildAt(textLayer.children.length - 1);
-            }
-            floatingTexts.forEach((ft, i) => {
-                let t = textLayer.children[i];
-                t.text = ft.text;
-                t.x = ft.x;
-                t.y = ft.y;
-                t.alpha = ft.life;
-                t.style.fill = ft.color;
-                t.anchor.set(0.5);
-            });
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+            ctx.restore();
 
             // UI da Anomalia
             let timeUntilPulseUI =
@@ -5759,31 +5981,69 @@
                 !isGameOver &&
                 !inBonusStage
             ) {
+                ctx.fillStyle = `rgba(255, 0, 255, ${Math.abs(Math.sin(Date.now() / 200))})`;
+                ctx.font = "bold 40px 'Space Grotesk', sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "#ff00ff";
+                ctx.fillText(
+                    "ANOMALIA DETECTADA",
+                    canvas.width / 2,
+                    canvas.height / 2 - 100,
+                );
+                ctx.font = "bold 30px 'Space Grotesk', sans-serif";
+                ctx.fillText(
+                    (timeUntilPulseUI / 1000).toFixed(1) + "s",
+                    canvas.width / 2,
+                    canvas.height / 2 - 50,
+                );
+                ctx.shadowBlur = 0;
             }
 
             if (activeAnomaly && !isGameOver && !inBonusStage) {
+                ctx.fillStyle = `rgba(255, 0, 255, 0.8)`;
+                ctx.font = "bold 20px 'Space Grotesk', sans-serif";
+                ctx.textAlign = "center";
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "#ff00ff";
+                let name = activeAnomaly.replace(/_/g, " ");
+                ctx.fillText(
+                    `ANOMALIA ATIVA: ${name} (${Math.ceil((anomalyEndTime - Date.now()) / 1000)}s)`,
+                    canvas.width / 2,
+                    80,
+                );
+                ctx.shadowBlur = 0;
             }
 
-            // Atualização dos Shaders Dinâmicos
-            if (crtFilter) {
-                crtFilter.time += 0.3 * timeScale;
-                crtFilter.seed = Math.random();
+            // Simulação visual de Glitch / Aberração Cromática
+            if (flashAlpha > 0.5) {
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                ctx.globalCompositeOperation = "screen";
+                // Reutiliza o próprio canvas como buffer para criar o efeito de deslocamento rápido (Glitch)
+                ctx.drawImage(canvas, Math.random() * 15, Math.random() * 5);
+                ctx.drawImage(canvas, Math.random() * -15, Math.random() * -5);
+                ctx.restore();
             }
 
-            // Aberração Cromática extrema e Glitch durante Pulse ou SlowMo (Adrenaline Mode)
             if (timeScale < 0.9) {
-                glitchFilter.enabled = true;
-                glitchFilter.offset = (1 - timeScale) * 20; // Intensidade baseada na distorção temporal
-                glitchFilter.seed = Math.random();
-            } else if (flashAlpha > 0.5) {
-                glitchFilter.enabled = true;
-                glitchFilter.offset = flashAlpha * 40; // Intensidade baseada no dano/pulso
-                glitchFilter.seed = Math.random();
-            } else {
-                glitchFilter.enabled = false;
+                let gradient = ctx.createRadialGradient(
+                    canvas.width / 2,
+                    canvas.height / 2,
+                    canvas.height * 0.2,
+                    canvas.width / 2,
+                    canvas.height / 2,
+                    canvas.height,
+                );
+                gradient.addColorStop(0, "rgba(255,255,0,0)");
+                gradient.addColorStop(1, `rgba(255,255,0,${0.3 * (1 - timeScale)})`);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
-
             if (flashAlpha > 0) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 flashAlpha -= 0.05 * timeScale;
             }
         }
@@ -5797,7 +6057,9 @@
                     "Erro crítico no GameLoop. Matriz resetada para evitar tela preta:",
                     error,
                 );
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Limpa as distorções que poderiam ter quebrado o Canvas
             }
+            if (gameStarted) requestAnimationFrame(gameLoop);
         }
     </script>
     <!-- Google tag (gtag.js) -->
