@@ -1,81 +1,81 @@
-🔲 [SYSTEM.LOG] Infinity Caos // v0.9
+🔲 [SYSTEM.LOG] Infinity Chaos // v0.9
 
-"Bem-vindo ao Grid. A arena está ativa. As IAs estão à caça. Sobreviva."
+"Welcome to the Grid. The arena is active. The AIs are hunting. Survive."
 
-Infinity Caos é uma experiência arcade top-down implacável. Desenvolvido nativamente em HTML5 Canvas e JavaScript puro, este projeto empurra o jogador para um mundo procedural cibernético onde o movimento constante é a única forma de escapar à eliminação.
+Infinity Chaos is a relentless top-down arcade experience. Natively developed in HTML5 Canvas and pure JavaScript, this project pushes the player into a cyberpunk procedural world where constant movement is the only way to escape elimination.
 
-⚡ PROTOCOLOS DO SISTEMA (Features)
+⚡ SYSTEM PROTOCOLS (Features)
 
-🌍 Geração de Biomas Dinâmicos: A arena (4000x4000) reconfigura-se em zonas de combate tático: Arenas Abertas, Labirintos de Reflexão, Campos Minados e Zonas Mortas.
+🌍 Dynamic Biome Generation: The arena (4000x4000) reconfigures itself into tactical combat zones: Open Arenas, Reflection Mazes, Minefields, and Dead Zones.
 
-💥 Mutação de Pulso [CRÍTICO]: A cada 50s, uma anomalia varre a arena. O que não estiver atrás de cobertura é vaporizado. O ambiente sofre mutação instantânea.
+💥 Pulse Mutation [CRITICAL]: Every 50s, an anomaly sweeps across the arena. Anything not behind cover is vaporized. The environment undergoes instant mutation.
 
-⏳ Overdrive Neural (Adrenaline Mode): O tempo entra em colapso (Slow-Mo) quando a deteção de perigo é iminente. Use esta janela para executar manobras evasivas evasivas perfeitas.
+⏳ Neural Overdrive (Adrenaline Mode): Time slows down when danger detection is imminent. Use this window to execute perfect evasive maneuvers.
 
-🏆 Sincronização Global: Integração direta com os servidores Firebase (Firestore) para registo de pontuações em tempo real. O Top 10 dita quem domina a rede.
+🏆 Global Sync: Direct integration with Firebase (Firestore) servers for real-time score tracking. The Top 10 dictates who dominates the network.
 
-🕹️ INTERFACE DE OPERADOR (Como Jogar)
+🕹️ OPERATOR INTERFACE (How to Play)
 
-A sua missão é assimilar Alvos de Dados (Rosas) o mais rapidamente possível para escalar o multiplicador de Combo, enquanto evita a aniquilação.
+Your mission is to assimilate Data Targets (Roses) as quickly as possible to scale the Combo multiplier while avoiding annihilation.
 
-[ CONTROLOS DE NAVEGAÇÃO ]
+[NAVIGATION CONTROLS]
 
-🖥️ Desktop: O avatar segue o vetor do cursor. [CLIQUE ESQUERDO] para ativar o Propulsor (DASH).
+🖥️ Desktop: The avatar follows the cursor vector. [LEFT CLICK] to activate the Dash.
 
-📱 Mobile: Interface tátil (Joystick esquerdo) + Botão de DASH dedicado.
+📱 Mobile: Touch interface (left joystick) + dedicated Dash button.
 
-[ ARQUIVOS DE SUPORTE - POWERUPS ]
+[SUPPORT FILES - POWERUPS]
 
-🟢 Aegis (Escudo): Bloqueia a próxima instância de dano fatal.
+🟢 Aegis (Shield): Blocks the next instance of fatal damage.
 
-🔵 Overclock (Velocidade): Amplifica a mobilidade e intensifica o rastro de fotões.
+🔵 Overclock (Speed): Amplifies mobility and intensifies the photon trail.
 
-🟠 Singularidade (Bomba): Erradica ameaças de classe baixa num grande raio.
+🟠 Singularity (Bomb): Eradicates low-class threats in a large radius.
 
-⚠️ REGISTO DE AMEAÇAS (IAs Inimigas)
+⚠️ THREAT REGISTER (Enemy AIs)
 
-O sistema adapta-se à sua eficiência. Ameaças de nível superior são injetadas na arena consoante o seu Score.
+The system adapts to your efficiency. Higher-level threats are injected into the arena according to your Score.
 
-[ TIPO: CHASER ] 🔴 Normal: Entidade básica de perseguição vetorial.
+[TYPE: CHASER] 🔴 Normal: Basic vector-based pursuit entity.
 
-[ TIPO: ARTILLERY ] 🟡 Sniper: Imóvel. Dispara feixes de energia de alta velocidade. Aviso: Projéteis fazem ricochete em superfícies azuis.
+[TYPE: ARTILLERY] 🟡 Sniper: Immobile. Fires high-speed energy beams. Warning: Projectiles ricochet off blue surfaces.
 
-[ TIPO: VOID ] 👻 Phantom: Anomalia roxa. Ignora colisões geométricas. Perseguição espectral.
+[TYPE: VOID] 👻 Phantom: Purple anomaly. Ignores geometric collisions. Spectral pursuit.
 
-[ TIPO: SABOTEUR ] 💣 Mine Layer: Evade a aproximação do jogador e deixa rastros de explosivos voláteis com timer.
+[TYPE: SABOTEUR] 💣 Mine Layer: Evades player approach and leaves trails of volatile explosives with a timer.
 
-[ TIPO: PRECOGNITIVE ] 🎯 Hunter AI: Calcula vetores futuros. Interceta a sua trajetória em vez de o seguir.
+[TYPE: PRECOGNITIVE] 🎯 Hunter AI: Calculates future vectors. Intercepts your trajectory instead of following you.
 
-[ TIPO: ZEALOT ] 🚀 Kamikaze: Pisca a rosa/branco. Sobrecarga o motor e investe a velocidades extremas. Detona no impacto.
+[TYPE: ZEALOT] 🚀 Kamikaze: Flashes pink/white. Overloads the engine and charges at extreme speeds. Detonates on impact.
 
-👑 ENTIDADES APEX (Bosses)
+👑 APEX ENTITIES (Bosses)
 
-Aviso de incursão massiva a cada 100 pontos:
+Massive incursion warning every 100 points:
 
-[ THE ARCHITECT ] (Ciano): Manipulador da matriz. Força obstáculos inertes a moverem-se e constrói barreiras de contenção ao redor do alvo.
+[THE ARCHITECT] (Cyan): Matrix manipulator. Forces inert obstacles to move and builds containment barriers around the target.
 
-[ SNIPER GOD ] (Vermelho): Dispara rajadas em leque (3 lasers) que saltam pelo mapa. Utiliza translocação quântica (teleporte) após cada ataque.
+[SNIPER GOD] (Red): Fires fan-shaped bursts (3 lasers) that bounce across the map. Uses quantum translocation (teleportation) after each attack.
 
-⚙️ ARQUITETURA DE DADOS (Tech Stack)
+⚙️ DATA ARCHITECTURE (Tech Stack)
 
-Nenhuma framework gráfica externa foi utilizada. Construído para máxima performance "bare-metal":
+No external graphical frameworks were used. Built for maximum "bare-metal" performance:
 
-Motor de Renderização: HTML5 <canvas> com rotinas de partículas procedurais customizadas.
+Rendering Engine: HTML5 <canvas> with custom procedural particle routines.
 
-Lógica Core: Vanilla JavaScript (Física de colisões OBB, IA Vetorial, Loop de Animação).
+Core Logic: Vanilla JavaScript (OBB collision physics, Vector AI, Animation Loop).
 
-Soundscape: Síntese de áudio em tempo real via Web Audio API (Zero assets de áudio externos).
+Soundscape: Real-time audio synthesis via Web Audio API (Zero external audio assets).
 
-Backend: Firebase v11 (Auth Anónimo + regras seguras de Firestore para o Leaderboard).
+Backend: Firebase v11 (Anonymous Auth + secure Firestore rules for the Leaderboard).
 
-🔌 SEQUÊNCIA DE INÍCIO (Setup Local)
+🔌 STARTING SEQUENCE (Local Setup)
 
-O projeto é "Plug & Play".
+The project is "Plug & Play".
 
-Clone ou transfira os ficheiros.
+Clone or download the files.
 
-Execute o ficheiro square.html num browser moderno (Chrome/Edge/Firefox recomendado).
+Run the square.html file in a modern browser (Chrome/Edge/Firefox recommended).
 
-Conecte-se e tente dominar o Grid.
+Connect and try to master the Grid.
 
-"Fim de Transmissão." // Desenvolvido com muita Adrenalina e Café. Reporte anomalias (bugs) no nosso Discord.
+"End of Transmission." // Developed with lots of Adrenaline and Coffee. Report bugs on our Discord.
