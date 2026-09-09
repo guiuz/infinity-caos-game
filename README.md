@@ -1,81 +1,56 @@
-🔲 [SYSTEM.LOG] Infinity Chaos // v0.9
+# ⚡ Infinity Caos
 
-"Welcome to the Grid. The arena is active. The AIs are hunting. Survive."
+> Jogo arcade survival 2D em estilo neon/cyberpunk, desenvolvido nativamente com HTML5 Canvas e Vanilla JavaScript.
 
-Infinity Chaos is a relentless top-down arcade experience. Natively developed in HTML5 Canvas and pure JavaScript, this project pushes the player into a cyberpunk procedural world where constant movement is the only way to escape elimination.
+[![Live Demo](https://img.shields.io/badge/DEMO-infinitycaos.com-00f1fe?style=for-the-badge&logo=google-chrome&logoColor=black)](https://infinitycaos.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-ac89ff?style=for-the-badge)](LICENSE)
+[![Tech: Canvas 2D](https://img.shields.io/badge/Engine-HTML5_Canvas_2D-ff51fa?style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 
-⚡ SYSTEM PROTOCOLS (Features)
+---
 
-🌍 Dynamic Biome Generation: The arena (4000x4000) reconfigures itself into tactical combat zones: Open Arenas, Reflection Mazes, Minefields, and Dead Zones.
+## 🎮 Live Demo
 
-💥 Pulse Mutation [CRITICAL]: Every 50s, an anomaly sweeps across the arena. Anything not behind cover is vaporized. The environment undergoes instant mutation.
+Experimente o jogo diretamente no navegador: **[infinitycaos.com](https://infinitycaos.com/)**
 
-⏳ Neural Overdrive (Adrenaline Mode): Time slows down when danger detection is imminent. Use this window to execute perfect evasive maneuvers.
+---
 
-🏆 Global Sync: Direct integration with Firebase (Firestore) servers for real-time score tracking. The Top 10 dictates who dominates the network.
+## 🚀 Destaques do Projeto
 
-🕹️ OPERATOR INTERFACE (How to Play)
+* **Renderização Nativa a 60 FPS:** Construído diretamente sobre a API Canvas 2D sem bibliotecas pesadas de jogos, garantindo carregamento ultrarrápido e consumo reduzido de recursos.
+* **Geração Procedural de Arena (4000x4000):** O mapa reconfigura obstáculos e zonas de perigo dinamicamente (arenas abertas, labirintos de reflexão e campos minados).
+* **Pulse Anomaly:** A cada 50 segundos, uma onda de pulso varre o mapa a partir do centro, exigindo uso tático de coberturas.
+* **Adrenaline Mode:** Sistema de *time-dilation* que desacelera o tempo quando o jogador está em rota iminente de colisão com projéteis ou inimigos.
+* **Persistência e Ranking Global:** Integração com Firebase (Firestore/Auth) para sincronização e ranking de pontuações em tempo real.
 
-Your mission is to assimilate Data Targets (Roses) as quickly as possible to scale the Combo multiplier while avoiding annihilation.
+---
 
-[NAVIGATION CONTROLS]
+## 👾 Inteligência Artificial & Inimigos
 
-🖥️ Desktop: The avatar follows the cursor vector. [LEFT CLICK] to activate the Dash.
+Cada tipo de inimigo implementa um comportamento vetorial próprio:
 
-📱 Mobile: Touch interface (left joystick) + dedicated Dash button.
+| Inimigo | Comportamento |
+| :--- | :--- |
+| **Phantom** | Flutua diretamente em perseguição ao jogador, ignorando colisões com paredes. |
+| **Kamikaze** | Fixa a mira, carrega energia e realiza investida de alta velocidade em linha reta. |
+| **Hunter AI** | Algoritmo de predição de trajetória que busca interceptar o movimento futuro do jogador. |
+| **Sniper** | Mantém distância de combate, projeta feixe de mira laser e dispara projéteis velozes. |
+| **Ambusher** | Oculta-se atrás de obstáculos estáticos e acelera ao detectar proximidade. |
+| **Espectro Ocular** | Boss/ameaça de alta velocidade com perseguição implacável. |
 
-[SUPPORT FILES - POWERUPS]
+---
 
-🟢 Aegis (Shield): Blocks the next instance of fatal damage.
+## 🛠️ Stack Tecnológico
 
-🔵 Overclock (Speed): Amplifies mobility and intensifies the photon trail.
+* **Core:** HTML5 Canvas, JavaScript (ES6+).
+* **Estilização & UI:** Tailwind CSS, Google Fonts (*Space Grotesk*, *Manrope*, *Tiny5*), Material Symbols.
+* **Backend & Serviços:** Firebase (Authentication, Firestore Database), Google AdSense.
+* **Áudio:** Web Audio API / integração de trilha sonora dinâmica.
 
-🟠 Singularity (Bomb): Eradicates low-class threats in a large radius.
+---
 
-⚠️ THREAT REGISTER (Enemy AIs)
+## 💻 Como Rodar Localmente
 
-The system adapts to your efficiency. Higher-level threats are injected into the arena according to your Score.
-
-[TYPE: CHASER] 🔴 Normal: Basic vector-based pursuit entity.
-
-[TYPE: ARTILLERY] 🟡 Sniper: Immobile. Fires high-speed energy beams. Warning: Projectiles ricochet off blue surfaces.
-
-[TYPE: VOID] 👻 Phantom: Purple anomaly. Ignores geometric collisions. Spectral pursuit.
-
-[TYPE: SABOTEUR] 💣 Mine Layer: Evades player approach and leaves trails of volatile explosives with a timer.
-
-[TYPE: PRECOGNITIVE] 🎯 Hunter AI: Calculates future vectors. Intercepts your trajectory instead of following you.
-
-[TYPE: ZEALOT] 🚀 Kamikaze: Flashes pink/white. Overloads the engine and charges at extreme speeds. Detonates on impact.
-
-👑 APEX ENTITIES (Bosses)
-
-Massive incursion warning every 100 points:
-
-[THE ARCHITECT] (Cyan): Matrix manipulator. Forces inert obstacles to move and builds containment barriers around the target.
-
-[SNIPER GOD] (Red): Fires fan-shaped bursts (3 lasers) that bounce across the map. Uses quantum translocation (teleportation) after each attack.
-
-⚙️ DATA ARCHITECTURE (Tech Stack)
-
-No external graphical frameworks were used. Built for maximum "bare-metal" performance:
-
-Rendering Engine: HTML5 <canvas> with custom procedural particle routines.
-
-Core Logic: Vanilla JavaScript (OBB collision physics, Vector AI, Animation Loop).
-
-Soundscape: Real-time audio synthesis via Web Audio API (Zero external audio assets).
-
-Backend: Firebase v11 (Anonymous Auth + secure Firestore rules for the Leaderboard).
-
-🔌 STARTING SEQUENCE (Local Setup)
-
-The project is "Plug & Play".
-
-Clone or download the files.
-
-Run the square.html file in a modern browser (Chrome/Edge/Firefox recommended).
-
-Connect and try to master the Grid.
-
-"End of Transmission." // Developed with lots of Adrenaline and Coffee. Report bugs on our Discord.
+1. Clone o repositório:
+   ```bash
+   git clone [https://github.com/guiuz/infinity-caos-game.git](https://github.com/guiuz/infinity-caos-game.git)
+   cd infinity-caos-game
