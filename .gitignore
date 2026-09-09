@@ -1,0 +1,15 @@
+# Dependências locais
+node_modules/
+
+# Configurações de ambiente e IDEs
+mcp-config.json
+.vscode/
+.idea/
+*.log
+
+# Arquivos temporários de teste
+temp_tela.html
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
